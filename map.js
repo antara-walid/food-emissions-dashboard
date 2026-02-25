@@ -1,45 +1,4 @@
-let data = [];
-let geoData = {};
-
-let currentYear = 2015;
-let selectedMetric = "Total (tonnes CO₂eq)";
-let selectedCountries = ["FRA", "USA", "CHN"];
-let lastFocus = null;
-
-const mapContainer = d3.select("#map-container");
-const tooltip = d3.select("#tooltip");
-
-Promise.all([
-    d3.csv("merged_emissions_and_food_share_data.csv", d3.autoType),
-    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
-]).then(([csvData, mapData]) => {
-    
-    data = csvData.map(d => ({
-        country: d.Entity,
-        id: d.Code,  
-        year: d.Year,
-        emission_total: d["Greenhouse gas emissions from food"],
-        emission_share: d["Share of total greenhouse gas emissions that come from food"]
-    })).filter(d => d.id);
-
-    geoData = mapData;
-
-    drawMap();
-    
-    d3.select("#yearSlider").on("input", function() {
-        currentYear = +this.value;
-        d3.select("#yearDisplay").text(currentYear);
-        drawMap();
-    });
-
-    d3.selectAll("input[name='metric']").on("change", function() {
-        selectedMetric = this.value;
-        drawMap();
-    });
-});
-
 function drawMap() {
-    // we clear the previous map
     mapContainer.selectAll("svg").remove();
 
     const width = 800;
@@ -47,7 +6,6 @@ function drawMap() {
     const legendHeight = 20;
     const legendWidth = 300;
 
-    // create new one 
     const svg = mapContainer.append("svg")
         .attr("viewBox", `0 0 ${width} ${height}`)
         .style("width", "100%")
@@ -65,19 +23,19 @@ function drawMap() {
     const path = d3.geoPath().projection(projection);
 
     const currentData = data.filter(d => d.year === currentYear);
-    // map key is id and map value can be emission_total or emissio_share depending on isTotal flag
     const dataMap = new Map(currentData.map(d => [d.id, getValue(d)]));
 
     let domain = d3.extent(currentData, getValue);
     if (isTotal) {
-        // we default to 100000 as min value fot the log scaler 
         domain[0] = Math.max(100000, domain[0] || 100000); 
+    } else {
+        domain[0] = Math.max(0, domain[0]); 
+        domain[1] = Math.min(100, domain[1]);
     }
-    // logscale for emission total  
-    // linear scal for emission share
+
     const colorScale = isTotal
         ? d3.scaleLog().domain(domain).range(["#e0f3db", "#0868ac"]).interpolate(d3.interpolateHcl)
-        : d3.scaleLinear().domain([0,100]).range(["#fee0d2", "#de2d26"]).clamp(true).interpolate(d3.interpolateHcl); // clamp to avoid outliers
+        : d3.scaleLinear().domain([0,100]).range(["#feedde", "#a63603"]).clamp(true).interpolate(d3.interpolateHcl);
 
     const gMap = svg.append("g");
 
@@ -124,32 +82,28 @@ function drawMap() {
             const name = d.properties.name;
             const code = d.id;
 
-            if (selectedCountries.includes(code)) { // remove the country if in selectedCountries
+            if (selectedCountries.includes(code)) {
                 selectedCountries = selectedCountries.filter(c => c !== code);
             } else {
-                selectedCountries.push(code); // add it if not in selectedCountries
+                selectedCountries.push(code);
             }
-            // used to draw info of last focus country
+            
             lastFocus = { id: code, name: name, value: val };
-            drawMap();
+            
+            updateAllCharts();
         });
-    
-    // info panel
 
     const infoGroup = svg.append("g").attr("transform", `translate(20, 20)`);
-    const infoTitle = infoGroup.append("text").attr("font-weight", "bold")
-            .attr("font-size", "18px").attr("fill", "#333")
-            .text("Sélectionnez un pays...");
-    const infoValue = infoGroup.append("text").attr("y", 25)
-    .attr("font-size", "14px").attr("fill", "#666").text("");
+    const infoTitle = infoGroup.append("text").attr("font-weight", "bold").attr("font-size", "18px").attr("fill", "#333").text("Sélectionnez un pays...");
+    const infoValue = infoGroup.append("text").attr("y", 25).attr("font-size", "14px").attr("fill", "#666").text("");
 
     function drawInfo(name, value) {
         infoTitle.text(name);
         if (value != null) {
-            if (isTotal) { // emission total
+            if (isTotal) {
                 const formatted = d3.format(".2s")(value).replace("G", "Md");
                 infoValue.text(`Émissions : ${formatted} tonnes CO₂eq`);
-            } else { // emission share
+            } else {
                 infoValue.text(`Part agricole : ${d3.format(".1f")(value)} %`);
             }
         } else {
@@ -157,49 +111,36 @@ function drawMap() {
         }
     }
 
-    // legend
-
-    const legendGroup = svg.append("g")
-        .attr("transform", `translate(${(width - legendWidth) / 2}, ${height - 60})`);
-
+    const legendGroup = svg.append("g").attr("transform", `translate(${(width - legendWidth) / 2}, ${height - 60})`);
     const getGradientValue = (pct) => isTotal 
         ? domain[0] * Math.pow(domain[1]/domain[0], pct)
         : domain[0] + pct * (domain[1] - domain[0]);
 
     const defs = svg.append("defs");
     const linearGradient = defs.append("linearGradient").attr("id", "grad");
-    linearGradient.selectAll("stop")
-        .data(d3.range(0, 1.1, 0.1))
-        .enter().append("stop")
-        .attr("offset", d => d)
-        .attr("stop-color", d => colorScale(getGradientValue(d)));
+    linearGradient.selectAll("stop").data(d3.range(0, 1.1, 0.1)).enter().append("stop")
+        .attr("offset", d => d).attr("stop-color", d => colorScale(getGradientValue(d)));
 
-    legendGroup.append("rect")
-        .attr("width", legendWidth).attr("height", legendHeight)
-        .style("fill", "url(#grad)").attr("rx", 5);
+    legendGroup.append("rect").attr("width", legendWidth).attr("height", legendHeight).style("fill", "url(#grad)").attr("rx", 5);
 
     const legendScalePos = isTotal 
         ? d3.scaleLog().domain(domain).range([0, legendWidth])
         : d3.scaleLinear().domain(domain).range([0, legendWidth]);
 
     const legendAxis = d3.axisBottom(legendScalePos).ticks(5, isTotal ? ".0s" : ".0f");
-    
-    legendGroup.append("g")
-        .attr("transform", `translate(0, ${legendHeight})`)
-        .call(legendAxis).select(".domain").remove();
+    legendGroup.append("g").attr("transform", `translate(0, ${legendHeight})`).call(legendAxis).select(".domain").remove();
 
     const cursor = legendGroup.append("g").attr("opacity", 0);
-    cursor.append("path")
-        .attr("d", d3.symbol().type(d3.symbolTriangle).size(100))
-        .attr("transform", "rotate(180)")
-        .attr("fill", "#333").attr("stroke", "white");
-    const cursorText = cursor.append("text")
-        .attr("y", -10).attr("text-anchor", "middle")
-        .attr("font-size", "11px").attr("font-weight", "bold").attr("fill", "#333");
+    cursor.append("path").attr("d", d3.symbol().type(d3.symbolTriangle).size(100)).attr("transform", "rotate(180)").attr("fill", "#333").attr("stroke", "white");
+    const cursorText = cursor.append("text").attr("y", -10).attr("text-anchor", "middle").attr("font-size", "11px").attr("font-weight", "bold").attr("fill", "#333");
 
     function drawCursor(value, name) {
         if (value == null) { cursor.attr("opacity", 0); return; }
-        const x = legendScalePos(value);
+        let safeValue = value;
+        if (!isTotal) { safeValue = Math.max(0, Math.min(100, value)); }
+        else { safeValue = Math.max(domain[0], Math.min(domain[1], value)); }
+
+        const x = legendScalePos(safeValue);
         cursor.attr("opacity", 1).attr("transform", `translate(${x}, 0)`);
         cursorText.text(name);
     }
@@ -210,10 +151,3 @@ function drawMap() {
         drawCursor(currentVal, lastFocus.name);
     }
 }
-
-
-// some countries that absorb more than they emit have negative Total Net Emissions.
-
-// Share = (Food Emissions) / (Total Net Emissions)
-
-// Total Net Emissions is calculated by taking every source of pollution in the country and subtracting the carbon the forests absorb.

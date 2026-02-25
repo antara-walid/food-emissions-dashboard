@@ -4,14 +4,16 @@ body {
     margin: 0;
     padding: 20px;
 }
+
 .dashboard {
-    max-width: 1000px;
+    max-width: 1400px;
     margin: 0 auto;
     background: white;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
+
 .controls {
     display: flex;
     justify-content: space-between;
@@ -20,11 +22,43 @@ body {
     padding-bottom: 20px;
     border-bottom: 1px solid #eee;
 }
+
 .control-group {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
+.main-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.left-panel {
+    flex: 2;
+    min-width: 500px;
+}
+
+.right-panel {
+    flex: 1;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#stacked-chart-container, #line-chart-container, #bar-chart-container {
+    width: 100%;
+    background: white;
+}
+
+#map-container {
+    position: relative;
+    width: 100%;
+}
+
 #tooltip {
     position: absolute;
     visibility: hidden;
@@ -36,9 +70,5 @@ body {
     pointer-events: none;
     font-size: 14px;
     color: #333;
-    z-index: 10;
-}
-#map-container {
-    position: relative;
-    width: 100%;
+    z-index: 100;
 }

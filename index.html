@@ -11,7 +11,7 @@
     <div class="dashboard">
         <div class="controls">
             <div class="control-group">
-                <label><strong>Métrique affichée :</strong></label>
+                <label><strong>Métrique affichée (Carte) :</strong></label>
                 <div>
                     <input type="radio" id="metricTotal" name="metric" value="Total (tonnes CO₂eq)" checked>
                     <label for="metricTotal">Total (tonnes CO₂eq)</label>
@@ -27,11 +27,28 @@
             </div>
         </div>
 
-        <div id="map-container">
-            <div id="tooltip"></div>
+        <div class="main-content">
+            
+            <div class="left-panel">
+                <div id="map-container">
+                    <div id="tooltip"></div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div id="bar-chart-container"></div>
+                <div id="line-chart-container"></div>
+            </div>
+
         </div>
+
+        <div id="stacked-chart-container" style="margin-bottom: 20px;"></div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="stackedChart.js"></script>
+    <script src="lineChart.js"></script>
+    <script src="barChart.js"></script>
+    <script src="map.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

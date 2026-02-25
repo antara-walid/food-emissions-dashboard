@@ -96,7 +96,7 @@ function drawStackedChart() {
 
     svg.append("text").attr("x", margin.left).attr("y", margin.top - 15)
         .attr("font-size", "16px").attr("font-weight", "bold").attr("fill", "#333")
-        .text(selectedCountries.length === 0 ? "🌍 Cycle de vie mondial" : `📍 Cycle de vie : ${selectedCountries.join(", ")}`);
+        .text(selectedCountries.length === 0 ? "Cycle de vie mondial" : `Cycle de vie : ${selectedCountries.join(", ")}`);
 
     const legend = svg.append("g").attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`);
     [...stages].reverse().forEach((key, i) => {

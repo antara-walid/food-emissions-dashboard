@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="dashboard">
         <div class="controls">
             <div class="control-group">
@@ -20,35 +19,44 @@
                     <label for="metricShare">Part des émissions totales (%)</label>
                 </div>
             </div>
-
             <div class="control-group" style="text-align: right;">
                 <label for="yearSlider"><strong>Année : <span id="yearDisplay">2015</span></strong></label>
                 <input type="range" id="yearSlider" min="1990" max="2015" value="2015" step="1" style="width: 250px;">
             </div>
         </div>
-
         <div class="main-content">
-            
             <div class="left-panel">
                 <div id="map-container">
                     <div id="tooltip"></div>
                 </div>
             </div>
-
             <div class="right-panel">
                 <div id="bar-chart-container"></div>
                 <div id="line-chart-container"></div>
             </div>
-
         </div>
-
+        
         <div id="stacked-chart-container" style="margin-bottom: 20px;"></div>
+
+        
+
+        <div class="food-section">
+            <h2 class="food-title">Quel aliment pollue le plus ?</h2>
+            <div class="food-charts-wrapper">
+                <div id="food-bar-container"></div>
+                <div id="food-donut-wrapper">
+                    <div id="food-donut-container"></div>
+                    <div id="food-donut-legend"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="stackedChart.js"></script>
     <script src="lineChart.js"></script>
     <script src="barChart.js"></script>
     <script src="map.js"></script>
+    <script src="foodCharts.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

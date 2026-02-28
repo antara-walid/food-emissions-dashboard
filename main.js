@@ -1,6 +1,7 @@
 let data = [];
 let geoData = {};
 let faoData = [];
+let foodData = [];
 
 let currentYear = 2015;
 let selectedMetric = "Total (tonnes CO₂eq)";
@@ -13,8 +14,9 @@ const tooltip = d3.select("#tooltip");
 Promise.all([
     d3.csv("merged_emissions_and_food_share_data.csv", d3.autoType),
     d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
-    d3.csv("fao_cleaned.csv", d3.autoType)
-]).then(([csvData, mapData, faoRawData]) => {
+    d3.csv("fao_cleaned.csv", d3.autoType),
+    d3.csv("Food_Production (1).csv", d3.autoType)
+]).then(([csvData, mapData, faoRawData, foodRawData]) => {
     
     data = csvData.map(d => ({
         country: d.Entity,
@@ -26,8 +28,10 @@ Promise.all([
 
     geoData = mapData;
     faoData = faoRawData;
+    foodData = foodRawData;
 
     updateAllCharts();
+    drawFoodCharts();
     
     d3.select("#yearSlider").on("input", function() {
         currentYear = +this.value;

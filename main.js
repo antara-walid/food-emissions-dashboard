@@ -15,7 +15,7 @@ Promise.all([
     d3.csv("merged_emissions_and_food_share_data.csv", d3.autoType),
     d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
     d3.csv("fao_cleaned.csv", d3.autoType),
-    d3.csv("Food_Production (1).csv", d3.autoType)
+    d3.csv("Food_Production.csv", d3.autoType)
 ]).then(([csvData, mapData, faoRawData, foodRawData]) => {
     
     data = csvData.map(d => ({

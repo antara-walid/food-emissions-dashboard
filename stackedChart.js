@@ -2,9 +2,9 @@ function drawStackedChart() {
     const containerDiv = d3.select("#stacked-chart-container");
     containerDiv.selectAll("*").remove();
 
-    const width = 900;
+    const width = containerDiv.node().getBoundingClientRect().width || 900;
     const height = 350;
-    const margin = {top: 40, right: 150, bottom: 30, left: 60}; 
+    const margin = {top: 40, right: 30, bottom: 30, left: 60}; 
 
     const shortLabels = {
         "Changement d'utilisation des terres": "Déforestation",
@@ -12,7 +12,7 @@ function drawStackedChart() {
         "Transformation des aliments": "Transformation",
         "Emballage alimentaire": "Emballage",
         "Transporte des alimentaires": "Transport",
-        "Commerce de détail alimentaire": "Vente & Supermarchés",
+        "Commerce de détail alimentaire": "Supermarchés",
         "Consommation des ménages": "Ménages",
         "Évacuation des déchets des systèmes agroalimentaires": "Déchets"
     };
@@ -59,17 +59,18 @@ function drawStackedChart() {
         .style("position", "absolute")
         .style("visibility", "hidden")
         .style("background", "white")
+        .style("padding", "10px")
         .style("border", "1px solid #ccc")
-        .style("padding", "5px 10px")
         .style("border-radius", "4px")
         .style("pointer-events", "none")
-        .style("font-size", "12px")
+        .style("font-size", "11px")
         .style("color", "#333")
         .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
         .style("z-index", "100");
 
     const svg = container.append("svg")
-        .attr("viewBox", [0, 0, width, height])
+        .attr("width", width)
+        .attr("height", height)
         .style("background", "white")
         .style("border-radius", "8px");
 
@@ -96,14 +97,36 @@ function drawStackedChart() {
 
     svg.append("text").attr("x", margin.left).attr("y", margin.top - 15)
         .attr("font-size", "16px").attr("font-weight", "bold").attr("fill", "#333")
-        .text(selectedCountries.length === 0 ? "Cycle de vie mondial" : `Cycle de vie : ${selectedCountries.join(", ")}`);
+        .text(selectedCountries.length === 0 ? "Cycle de vie mondial" : `Cycle de vie des pays sélectionnés`);
 
-    const legend = svg.append("g").attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`);
-    [...stages].reverse().forEach((key, i) => {
-        const row = legend.append("g").attr("transform", `translate(0, ${i * 25})`);
-        row.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(key)).attr("rx", 2);
-        row.append("text").attr("x", 20).attr("y", 10).attr("font-size", "11px").attr("fill", "#333").text(shortLabels[key]);
-    });
+    const focus = svg.append("g").style("display", "none");
+
+    focus.append("line")
+        .attr("class", "hover-line")
+        .attr("stroke", "#333")
+        .attr("stroke-width", 1.5)
+        .attr("stroke-dasharray", "4,4")
+        .attr("y1", margin.top)
+        .attr("y2", height - margin.bottom);
+
+    const badge = focus.append("g").attr("class", "hover-badge");
+    
+    badge.append("rect")
+        .attr("fill", "#333")
+        .attr("rx", 3)
+        .attr("width", 40)
+        .attr("height", 20)
+        .attr("x", -20)
+        .attr("y", margin.top - 20);
+    
+    badge.append("text")
+        .attr("class", "hover-badge-text")
+        .attr("fill", "white")
+        .attr("font-size", "11px")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "middle")
+        .attr("x", 0)
+        .attr("y", margin.top - 6);
 
     svg.append("rect")
         .attr("width", width - margin.left - margin.right)
@@ -111,38 +134,65 @@ function drawStackedChart() {
         .attr("x", margin.left)
         .attr("y", margin.top)
         .attr("fill", "transparent")
+        .on("mouseover", () => {
+            focus.style("display", null);
+            tooltip.style("visibility", "visible");
+        })
+        .on("mouseout", () => {
+            focus.style("display", "none");
+            tooltip.style("visibility", "hidden");
+        })
         .on("mousemove", function(event) {
             const [mouseX, mouseY] = d3.pointer(event);
-            
             const year = Math.round(x.invert(mouseX));
             
             const bisect = d3.bisector(d => d.Annee).center;
             const i = bisect(stackData, year);
             
-            if (i < 0 || i >= stackData.length) { tooltip.style("visibility", "hidden"); return; }
-            
-            const yValue = y.invert(mouseY);
-            const layer = series.find(s => {
-                const point = s[i];
-                return point && point[0] <= yValue && point[1] >= yValue;
-            });
+            if (i < 0 || i >= stackData.length) return;
 
-            if (layer) {
-                const stageName = layer.key;
-                const value = stackData[i][stageName];
-                const frenchName = shortLabels[stageName];
+            const actualX = x(year);
+            
+            focus.select(".hover-line").attr("x1", actualX).attr("x2", actualX);
+            focus.select(".hover-badge").attr("transform", `translate(${actualX}, 0)`);
+            focus.select(".hover-badge-text").text(year);
+
+            const yearData = stackData[i];
+            let total = 0;
+            
+            let htmlContent = `<div style="display:flex; flex-direction:column; gap:4px;">`;
+            
+            [...stages].reverse().forEach(stage => {
+                const value = yearData[stage];
+                total += value;
+                const frenchName = shortLabels[stage];
                 
-                tooltip
-                    .style("visibility", "visible")
-                    .html(`
-                        <div style="font-weight:bold;">${frenchName}</div>
-                        <div>${d3.format(".2s")(value)} t (${year})</div>
-                    `)
-                    .style("left", (mouseX + 15) + "px")
-                    .style("top", (mouseY + 15) + "px");
-            } else {
-                tooltip.style("visibility", "hidden");
-            }
-        })
-        .on("mouseleave", () => tooltip.style("visibility", "hidden"));
+                htmlContent += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; width:180px;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <div style="width:10px; height:10px; background:${color(stage)}; border-radius:2px;"></div>
+                            <span style="color:#666;">${frenchName} :</span>
+                        </div>
+                        <span style="font-weight:bold;">${d3.format(".2s")(value).replace("G", "Md")} t</span>
+                    </div>
+                `;
+            });
+            
+            htmlContent += `
+                <div style="margin-top:8px; padding-top:8px; display:flex; justify-content:space-between; font-weight:bold; color:#d62728; border-top:1px solid #eee;">
+                    <span>TOTAL :</span>
+                    <span>${d3.format(".2s")(total).replace("G", "Md")} t</span>
+                </div>
+            </div>`;
+            
+            tooltip.html(htmlContent);
+            
+            const tooltipX = actualX + 15;
+            const finalX = tooltipX > width - 240 ? actualX - 220 : tooltipX;
+            const finalY = Math.max(margin.top, Math.min(mouseY, height - margin.bottom - 200));
+            
+            tooltip
+                .style("left", finalX + "px")
+                .style("top", finalY + "px");
+        });
 }

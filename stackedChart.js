@@ -3,7 +3,7 @@ function drawStackedChart() {
     containerDiv.selectAll("*").remove();
 
     const width = containerDiv.node().getBoundingClientRect().width || 900;
-    const height = 350;
+    const height = 300;
     const margin = {top: 40, right: 30, bottom: 30, left: 60}; 
 
     const shortLabels = {

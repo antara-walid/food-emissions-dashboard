@@ -39,7 +39,7 @@ Promise.all([
         updateAllCharts();
     });
 
-    d3.selectAll("input[name='metric']").on("change", function() {
+    d3.selectAll("#metricSelect").on("change", function() {
         selectedMetric = this.value;
         updateAllCharts();
     });

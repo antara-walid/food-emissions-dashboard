@@ -8,28 +8,35 @@
 </head>
 <body>
     <div class="dashboard">
-        <div class="controls">
-            <div class="control-group">
-                <label><strong>Métrique affichée (Carte) :</strong></label>
-                <div>
-                    <input type="radio" id="metricTotal" name="metric" value="Total (tonnes CO₂eq)" checked>
-                    <label for="metricTotal">Total (tonnes CO₂eq)</label>
-                    <br>
-                    <input type="radio" id="metricShare" name="metric" value="Part des émissions totales (%)">
-                    <label for="metricShare">Part des émissions totales (%)</label>
-                </div>
-            </div>
-            <div class="control-group" style="text-align: right;">
-                <label for="yearSlider"><strong>Année : <span id="yearDisplay">2015</span></strong></label>
-                <input type="range" id="yearSlider" min="1990" max="2015" value="2015" step="1" style="width: 250px;">
-            </div>
-        </div>
+        
         <div class="main-content">
             <div class="left-panel">
-                <div id="map-container">
+                
+                <div id="map-container" style="position: relative;">
+                    
+                    <div class="floating-controls" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); padding: 10px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                            <label for="metricSelect" style="margin: 0; font-weight: bold;">Métrique :</label>
+                            <select id="metricSelect" name="metric" style="padding: 2px 4px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
+                                <option value="Total (tonnes CO₂eq)">Total (t CO₂eq)</option>
+                                <option value="Part des émissions totales (%)">Part (%)</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <label for="yearSlider" style="margin: 0; font-weight: bold;">Année :</label>
+                                <span id="yearDisplay" style="font-weight: bold; color: #333;">2015</span>
+                            </div>
+                            <input type="range" id="yearSlider" min="1990" max="2015" value="2015" step="1" style="width: 140px; margin: 0; cursor: pointer;">
+                        </div>
+
+                    </div>
                     <div id="tooltip"></div>
                 </div>
             </div>
+            
             <div class="right-panel">
                 <div id="bar-chart-container"></div>
                 <div id="line-chart-container"></div>
@@ -37,8 +44,6 @@
         </div>
         
         <div id="stacked-chart-container" style="margin-bottom: 20px;"></div>
-
-        
 
         <div class="food-section">
             <h2 class="food-title">Quel aliment pollue le plus ?</h2>

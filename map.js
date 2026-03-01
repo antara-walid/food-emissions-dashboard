@@ -2,7 +2,7 @@ function drawMap() {
     mapContainer.selectAll("svg").remove();
 
     const width = 800;
-    const height = 500;
+    const height = 400;
     const legendHeight = 20;
     const legendWidth = 300;
 
@@ -95,7 +95,7 @@ function drawMap() {
 
     const infoGroup = svg.append("g").attr("transform", `translate(20, 20)`);
     const infoTitle = infoGroup.append("text").attr("font-weight", "bold").attr("font-size", "18px").attr("fill", "#333").text("Sélectionnez un pays...");
-    const infoValue = infoGroup.append("text").attr("y", 25).attr("font-size", "14px").attr("fill", "#666").text("");
+    const infoValue = infoGroup.append("text").attr("y", 25).attr("font-size", "14px").attr("fill", "#333").text("");
 
     function drawInfo(name, value) {
         infoTitle.text(name);

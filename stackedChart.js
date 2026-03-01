@@ -3,12 +3,13 @@ function drawStackedChart() {
     containerDiv.selectAll("*").remove();
 
     const width = containerDiv.node().getBoundingClientRect().width || 900;
-    const height = 300;
-    const margin = {top: 40, right: 30, bottom: 30, left: 60}; 
+    const height = containerDiv.node().getBoundingClientRect().height || 300;
+    
+    const margin = {top: 40, right: 130, bottom: 30, left: 60}; 
 
     const shortLabels = {
         "Changement d'utilisation des terres": "Déforestation",
-        "Farm gate": "Agriculture (Ferme)",
+        "Farm gate": "Ferme",
         "Transformation des aliments": "Transformation",
         "Emballage alimentaire": "Emballage",
         "Transporte des alimentaires": "Transport",
@@ -53,7 +54,10 @@ function drawStackedChart() {
         return obj;
     }).sort((a, b) => a.Annee - b.Annee);
 
-    const container = containerDiv.append("div").style("position", "relative");
+    const container = containerDiv.append("div")
+        .style("position", "relative")
+        .style("width", "100%")
+        .style("height", "100%");
 
     const tooltip = container.append("div")
         .style("position", "absolute")
@@ -96,8 +100,28 @@ function drawStackedChart() {
     svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5, "s"));
 
     svg.append("text").attr("x", margin.left).attr("y", margin.top - 15)
-        .attr("font-size", "16px").attr("font-weight", "bold").attr("fill", "#333")
-        .text(selectedCountries.length === 0 ? "Cycle de vie mondial" : `Cycle de vie des pays sélectionnés`);
+        .attr("font-size", "14px").attr("font-weight", "bold").attr("fill", "#333")
+        .text(selectedCountries.length === 0 ? "Cycle de vie mondial" : `Émissions par étape`);
+
+    const legend = svg.append("g")
+        .attr("transform", `translate(${width - margin.right + 15}, ${margin.top})`);
+
+    [...stages].reverse().forEach((key, i) => {
+        const row = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
+        
+        row.append("rect")
+            .attr("width", 12)
+            .attr("height", 12)
+            .attr("fill", color(key))
+            .attr("rx", 2);
+            
+        row.append("text")
+            .attr("x", 18)
+            .attr("y", 10)
+            .attr("font-size", "11px")
+            .attr("fill", "#333")
+            .text(shortLabels[key]);
+    });
 
     const focus = svg.append("g").style("display", "none");
 

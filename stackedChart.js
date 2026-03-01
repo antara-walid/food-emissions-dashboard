@@ -101,7 +101,7 @@ function drawStackedChart() {
 
     svg.append("text").attr("x", margin.left).attr("y", margin.top - 15)
         .attr("font-size", "14px").attr("font-weight", "bold").attr("fill", "#333")
-        .text(selectedCountries.length === 0 ? "Émissions mondiales liées à l’alimentation selon les étapes du cycle de vie mondial" : `Émissions mondiales liées à l’alimentation selon les étapes du cycle de vie`);
+        .text(selectedCountries.length === 0 ? "Émissions mondiales liées à l’alimentation selon les étapes du cycle de vie mondial" : `Émissions liées à l’alimentation selon les étapes du cycle de vie`);
 
     const legend = svg.append("g")
         .attr("transform", `translate(${width - margin.right + 15}, ${margin.top})`);

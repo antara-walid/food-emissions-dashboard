@@ -104,7 +104,7 @@ function drawMap() {
                 const formatted = d3.format(".2s")(value).replace("G", "Md");
                 infoValue.text(`Émissions : ${formatted} tonnes CO₂eq`);
             } else {
-                infoValue.text(`Part agricole : ${d3.format(".1f")(value)} %`);
+                infoValue.text(`Part liées à l’alimentation : ${d3.format(".1f")(value)} %`);   // Part des émissions mondiales de gaz à effet de serre liées à l’alimentation
             }
         } else {
             infoValue.text("Pas de données pour cette année");

@@ -8,13 +8,13 @@ function drawStackedChart() {
     const margin = {top: 40, right: 130, bottom: 30, left: 60}; 
 
     const shortLabels = {
-        "Changement d'utilisation des terres": "Déforestation",
-        "Farm gate": "Ferme",
+        "Changement d'utilisation des terres": "Occupation des sols",
+        "Farm gate": "Production agricole",
         "Transformation des aliments": "Transformation",
         "Emballage alimentaire": "Emballage",
         "Transporte des alimentaires": "Transport",
-        "Commerce de détail alimentaire": "Supermarchés",
-        "Consommation des ménages": "Ménages",
+        "Commerce de détail alimentaire": "Distribution",
+        "Consommation des ménages": "Énergie domestique (cuisson)",
         "Évacuation des déchets des systèmes agroalimentaires": "Déchets"
     };
 
@@ -101,7 +101,7 @@ function drawStackedChart() {
 
     svg.append("text").attr("x", margin.left).attr("y", margin.top - 15)
         .attr("font-size", "14px").attr("font-weight", "bold").attr("fill", "#333")
-        .text(selectedCountries.length === 0 ? "Cycle de vie mondial" : `Émissions par étape`);
+        .text(selectedCountries.length === 0 ? "Émissions mondiales liées à l’alimentation selon les étapes du cycle de vie mondial" : `Émissions mondiales liées à l’alimentation selon les étapes du cycle de vie`);
 
     const legend = svg.append("g")
         .attr("transform", `translate(${width - margin.right + 15}, ${margin.top})`);

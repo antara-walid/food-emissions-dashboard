@@ -47,13 +47,13 @@ function drawFoodCharts() {
 
     const stages = ["Land use change", "Animal Feed", "Farm", "Processing", "Transport", "Packging", "Retail"];
     const stageLabels = {
-        "Land use change": "Déforestation", 
+        "Land use change": "Occupation des sols", 
         "Animal Feed": "Alimentation animale", 
-        "Farm": "À la Ferme", 
+        "Farm": "Production agricole", 
         "Processing": "Transformation", 
         "Transport": "Transport", 
         "Packging": "Emballage", 
-        "Retail": "Supermarché"
+        "Retail": "Distribution"
     };
     
     const color = d3.scaleOrdinal()

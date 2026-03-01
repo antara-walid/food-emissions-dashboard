@@ -11,7 +11,7 @@ function drawLineChart() {
     const isTotal = selectedMetric === "Total (tonnes CO₂eq)";
     const getValue = d => isTotal ? d.emission_total : d.emission_share;
     const formatValue = isTotal ? d3.format(".2s") : d => d3.format(".1f")(d) + "%";
-    const titleText = isTotal ? "Évolution des émissions totales" : "Évolution de la part agricole (%)";
+    const titleText = isTotal ? "Évolution des émissions totales" : "Évolution de la part liées à l’alimentation (%)";
 
     const container = containerDiv.append("div").style("position", "relative");
 

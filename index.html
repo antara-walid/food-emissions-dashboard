@@ -7,54 +7,75 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav class="navbar">
+        <h1 class="nav-title">Foodprint</h1>
+        <div class="nav-links">
+            <button class="nav-btn active" data-target="page-landing">Accueil</button>
+            <button class="nav-btn" data-target="page-dashboard">Émissions Globales</button>
+            <button class="nav-btn" data-target="page-food">Impact Alimentaire</button>
+        </div>
+    </nav>
+
     <div class="dashboard">
         
-        <div class="main-content">
-            <div class="left-panel">
-                
-                <div id="map-container" style="position: relative;">
-                    
-                    <div class="floating-controls" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); padding: 10px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div id="page-landing" class="page-section">
+            <div class="landing-content">
+                <h2>Bienvenue sur Foodprint</h2>
+                <p class="landing-description">Ce projet permet d'explorer l'impact des systèmes agricoles sur les émissions de gaz à effet de serre (GES). L'objectif est de réaliser une application interactive permettant de déconstruire l'empreinte carbone de différents aliments (viandes, céréales, laitiers, etc.) à travers leur cycle de vie complet.</p>
+                <p class="landing-cta">Sélectionnez une page dans le menu ci-dessus pour commencer l'exploration.</p>
+            </div>
+        </div>
+
+        <div id="page-dashboard" class="page-section" style="display: none;">
+            <div class="main-content">
+                <div class="left-panel">
+                    <div id="map-container" style="position: relative;">
                         
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-                            <label for="metricSelect" style="margin: 0; font-weight: bold;">Métrique :</label>
-                            <select id="metricSelect" name="metric" style="padding: 2px 4px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
-                                <option value="Total (tonnes CO₂eq)">Total (t CO₂eq)</option>
-                                <option value="Part des émissions totales (%)">Part (%)</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <label for="yearSlider" style="margin: 0; font-weight: bold;">Année :</label>
-                                <span id="yearDisplay" style="font-weight: bold; color: #333;">2015</span>
+                        <div class="floating-controls" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); padding: 10px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                                <label for="metricSelect" style="margin: 0; font-weight: bold;">Métrique :</label>
+                                <select id="metricSelect" name="metric" style="padding: 2px 4px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
+                                    <option value="Total (tonnes CO₂eq)">Total (t CO₂eq)</option>
+                                    <option value="Part des émissions totales (%)">Part (%)</option>
+                                </select>
                             </div>
-                            <input type="range" id="yearSlider" min="1990" max="2015" value="2015" step="1" style="width: 140px; margin: 0; cursor: pointer;">
-                        </div>
 
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <label for="yearSlider" style="margin: 0; font-weight: bold;">Année :</label>
+                                    <span id="yearDisplay" style="font-weight: bold; color: #333;">2015</span>
+                                </div>
+                                <input type="range" id="yearSlider" min="1990" max="2015" value="2015" step="1" style="width: 140px; margin: 0; cursor: pointer;">
+                            </div>
+
+                        </div>
+                        <div id="tooltip"></div>
                     </div>
-                    <div id="tooltip"></div>
+                </div>
+                
+                <div class="right-panel">
+                    <div id="bar-chart-container"></div>
+                    <div id="line-chart-container"></div>
                 </div>
             </div>
             
-            <div class="right-panel">
-                <div id="bar-chart-container"></div>
-                <div id="line-chart-container"></div>
-            </div>
+            <div id="stacked-chart-container" style="margin-bottom: 20px;"></div>
         </div>
-        
-        <div id="stacked-chart-container" style="margin-bottom: 20px;"></div>
 
-        <div class="food-section">
-            <h2 class="food-title">Quel aliment pollue le plus ?</h2>
-            <div class="food-charts-wrapper">
-                <div id="food-bar-container"></div>
-                <div id="food-donut-wrapper">
-                    <div id="food-donut-container"></div>
-                    <div id="food-donut-legend"></div>
+        <div id="page-food" class="page-section" style="display: none;">
+            <div class="food-section">
+                <h2 class="food-title">Zoom sur l'assiette : Quel aliment pollue le plus ?</h2>
+                <div class="food-charts-wrapper">
+                    <div id="food-bar-container"></div>
+                    <div id="food-donut-wrapper">
+                        <div id="food-donut-container"></div>
+                        <div id="food-donut-legend"></div>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script src="stackedChart.js"></script>
@@ -63,5 +84,35 @@
     <script src="map.js"></script>
     <script src="foodCharts.js"></script>
     <script src="main.js"></script>
+
+    <script>
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
+                
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).style.display = 'block';
+
+                if (targetId === 'page-dashboard' && typeof updateAllCharts === 'function') {
+                    updateAllCharts();
+                } else if (targetId === 'page-food' && typeof drawFoodCharts === 'function') {
+                    drawFoodCharts();
+                }
+            });
+        });
+
+        const selectElement = document.getElementById('metricSelect');
+        if(selectElement) {
+            selectElement.addEventListener('change', function() {
+                if (typeof selectedMetric !== 'undefined') {
+                    selectedMetric = this.value;
+                    if (typeof updateAllCharts === 'function') updateAllCharts();
+                }
+            });
+        }
+    </script>
 </body>
 </html>

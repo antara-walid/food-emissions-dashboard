@@ -2,81 +2,88 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Émissions & Agriculture</title>
+    <title>Foodprint - Dashboard Émissions</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <nav class="navbar">
-        <h1 class="nav-title">Foodprint</h1>
+        <h1 class="nav-title">🌱 Foodprint</h1>
         <div class="nav-links">
-            <button class="nav-btn active" data-target="page-landing">Accueil</button>
-            <button class="nav-btn" data-target="page-dashboard">Émissions Globales</button>
+            <button class="nav-btn" data-target="page-landing">Accueil</button>
+            <button class="nav-btn active" data-target="page-dashboard">Émissions Globales</button>
             <button class="nav-btn" data-target="page-food">Impact Alimentaire</button>
         </div>
     </nav>
 
-    <div class="dashboard">
-        
-        <div id="page-landing" class="page-section">
-            <div class="landing-content">
-                <h2>Bienvenue sur Foodprint</h2>
-                <p class="landing-description">Ce projet permet d'explorer l'impact de  systèmes alimentaires sur les émissions de gaz à effet de serre (GES). L'objectif est de réaliser une application interactive permettant de déconstruire l'empreinte carbone de différents aliments (viandes, céréales, laitiers, etc.) à travers leur cycle de vie complet.</p>
-                <p class="landing-cta">Sélectionnez une page dans le menu ci-dessus pour commencer l'exploration.</p>
-            </div>
-        </div>
-
-        <div id="page-dashboard" class="page-section" style="display: none;">
-            <div class="main-content">
-                <div class="left-panel">
-                    <div id="map-container" style="position: relative;">
-                        
-                        <div class="floating-controls" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); padding: 10px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
-                            
-                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-                                <label for="metricSelect" style="margin: 0; font-weight: bold;">Métrique :</label>
-                                <select id="metricSelect" name="metric" style="padding: 2px 4px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
-                                    <option value="Total (tonnes CO₂eq)">Total (t CO₂eq)</option>
-                                    <option value="Part des émissions totales (%)">Part (%)</option>
-                                </select>
-                            </div>
-
-                            <div style="display: flex; flex-direction: column; gap: 2px;">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <label for="yearSlider" style="margin: 0; font-weight: bold;">Année :</label>
-                                    <span id="yearDisplay" style="font-weight: bold; color: #333;">2015</span>
-                                </div>
-                                <input type="range" id="yearSlider" min="1990" max="2015" value="2015" step="1" style="width: 140px; margin: 0; cursor: pointer;">
-                            </div>
-
-                        </div>
-                        <div id="tooltip"></div>
-                    </div>
-                </div>
-                
-                <div class="right-panel">
-                    <div id="bar-chart-container"></div>
-                    <div id="line-chart-container"></div>
-                </div>
-            </div>
+    <section id="page-landing" class="page-section" style="display: none;">
+        <div class="glass-card">
+            <h2>Explorez l'Empreinte Carbone<br>de Votre Assiette</h2>
+            <h3 class="landing-subtitle">Comprendre l'Impact de nos Systèmes Alimentaires</h3>
             
-            <div id="stacked-chart-container" style="margin-bottom: 20px;"></div>
+            <p class="landing-description">
+                Ce projet permet d'explorer l'impact des systèmes alimentaires sur les émissions de gaz à effet de serre (GES). L'objectif est de réaliser une application interactive permettant de déconstruire l'empreinte carbone de différents aliments (viandes, céréales, laitiers, etc.) à travers leur cycle de vie complet.
+            </p>
+            
+            <button class="glass-btn" onclick="document.querySelector('[data-target=\'page-dashboard\']').click()">
+                Commencer l'Exploration
+            </button>
         </div>
+    </section>
 
-        <div id="page-food" class="page-section" style="display: none;">
-            <div class="food-section">
-                <h2 class="food-title">Zoom sur l'assiette : Quel aliment pollue le plus ?</h2>
-                <div class="food-charts-wrapper">
-                    <div id="food-bar-container"></div>
-                    <div id="food-donut-wrapper">
-                        <div id="food-donut-container"></div>
-                        <div id="food-donut-legend"></div>
+    <section id="page-dashboard" class="page-section fullscreen-dashboard">
+        <div class="dashboard-grid">
+            <div class="grid-top">
+                <div class="chart-card map-card">
+                    <div id="map-container"></div>
+                    
+                    <div class="floating-controls">
+                        <div class="control-row">
+                            <label for="metricSelect">Métrique :</label>
+                            <select id="metricSelect">
+                                <option value="Total (tonnes CO₂eq)">Total (t CO₂eq)</option>
+                                <option value="Part des émissions totales (%)">Part (%)</option>
+                            </select>
+                        </div>
+                        <div class="control-row-slider">
+                            <div class="slider-header">
+                                <label for="yearSlider">Année :</label>
+                                <span id="yearDisplay">2009</span>
+                            </div>
+                            <input type="range" id="yearSlider" min="1990" max="2015" value="2009" step="1">
+                        </div>
+                    </div>
+                    <div id="tooltip"></div>
+                </div>
+
+                <div class="side-charts">
+                    <div class="chart-card half-height">
+                        <div id="bar-chart-container"></div>
+                    </div>
+                    <div class="chart-card half-height">
+                        <div id="line-chart-container"></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </div>
+            <div class="grid-bottom chart-card">
+                <div id="stacked-chart-container"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="page-food" class="page-section" style="display: none;">
+        <div class="food-section">
+            <h2 class="food-title">Zoom sur l'assiette : Quel aliment pollue le plus ?</h2>
+            <div class="food-charts-wrapper">
+                <div id="food-bar-container"></div>
+                <div id="food-donut-wrapper">
+                    <div id="food-donut-container"></div>
+                    <div id="food-donut-legend"></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <script src="stackedChart.js"></script>
     <script src="lineChart.js"></script>
@@ -86,6 +93,7 @@
     <script src="main.js"></script>
 
     <script>
+        // --- 1. GESTION DES ONGLETS DE NAVIGATION ---
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -94,7 +102,14 @@
                 document.querySelectorAll('.page-section').forEach(p => p.style.display = 'none');
                 
                 const targetId = this.getAttribute('data-target');
-                document.getElementById(targetId).style.display = 'block';
+                const targetElement = document.getElementById(targetId);
+                
+                // LA CORRECTION EST ICI : On protège le centrage de l'accueil
+                if (targetId === 'page-landing') {
+                    targetElement.style.display = 'flex'; 
+                } else {
+                    targetElement.style.display = 'block';
+                }
 
                 if (targetId === 'page-dashboard' && typeof updateAllCharts === 'function') {
                     updateAllCharts();
@@ -104,7 +119,11 @@
             });
         });
 
+        // --- 2. GESTION DES CONTRÔLES (Métrique & Année) ---
         const selectElement = document.getElementById('metricSelect');
+        const yearSlider = document.getElementById('yearSlider');
+        const yearDisplay = document.getElementById('yearDisplay');
+
         if(selectElement) {
             selectElement.addEventListener('change', function() {
                 if (typeof selectedMetric !== 'undefined') {
@@ -113,6 +132,41 @@
                 }
             });
         }
+
+        if(yearSlider && yearDisplay) {
+            yearSlider.addEventListener('input', function() {
+                yearDisplay.textContent = this.value;
+                
+                if (typeof selectedYear !== 'undefined') {
+                    selectedYear = parseInt(this.value);
+                } else if (typeof currentYear !== 'undefined') {
+                    currentYear = parseInt(this.value);
+                }
+
+                if (typeof updateAllCharts === 'function') {
+                    updateAllCharts();
+                }
+            });
+        }
+
+        // --- 3. GESTION DE LA TAILLE D'ÉCRAN ---
+        window.addEventListener('resize', () => {
+            if (document.getElementById('page-dashboard').style.display !== 'none') {
+                if (typeof updateAllCharts === 'function') updateAllCharts();
+            }
+        });
+
+        // --- 4. INITIALISATION AU DÉMARRAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Force l'affichage de l'onglet Accueil par défaut au lancement
+            document.getElementById('page-landing').style.display = 'flex';
+            document.getElementById('page-food').style.display = 'none';
+            document.getElementById('page-dashboard').style.display = 'none';
+            
+            // Met le bon bouton en surbrillance
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-target="page-landing"]').classList.add('active');
+        });
     </script>
 </body>
 </html>

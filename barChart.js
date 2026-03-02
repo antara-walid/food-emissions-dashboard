@@ -2,24 +2,25 @@ function drawBarChart() {
     const containerDiv = d3.select("#bar-chart-container");
     containerDiv.selectAll("*").remove();
 
-    const containerWidth = containerDiv.node().getBoundingClientRect().width || 400;
+    // 1. Calcul dynamique de l'espace exact disponible
+    const rect = containerDiv.node().getBoundingClientRect();
+    const width = rect.width || 500; 
+    const height = rect.height || 300;
+    
+    // 2. Marges internes réduites pour "gonfler" le graphe
+    const margin = {top: 35, right: 20, bottom: 10, left: 90};
 
     const isTotal = selectedMetric === "Total (tonnes CO₂eq)";
     const getValue = d => isTotal ? d.emission_total : d.emission_share;
     const formatValue = isTotal ? d3.format(".2s") : d => d3.format(".1f")(d) + "%";
 
     let barData = data.filter(d => d.year === currentYear && selectedCountries.includes(d.id));
-    
     barData.sort((a, b) => getValue(b) - getValue(a));
 
-    const margin = {top: 30, right: 60, bottom: 10, left: 100};
-    const width = containerWidth; 
-    const contentHeight = Math.max(50, barData.length * 35); 
-    const height = contentHeight + margin.top + margin.bottom;
-
     const svg = containerDiv.append("svg")
-        .attr("width", width).attr("height", height)
-        .style("background", "white").style("border-radius", "8px");
+        .attr("width", width)
+        .attr("height", height)
+        .style("background", "white");
 
     if (barData.length === 0) {
         svg.append("text").attr("x", width/2).attr("y", height/2)
@@ -57,11 +58,12 @@ function drawBarChart() {
        .style("font-size", "11px").style("fill", "#333");
 
     svg.append("g").attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y).tickSize(0)).select(".domain").remove();
+        .call(d3.axisLeft(y).tickSize(0))
+        .select(".domain").remove();
      
     svg.append("text")
         .attr("x", margin.left)
         .attr("y", 20)
-        .style("font-weight", "bold").style("font-size", "14px")
+        .style("font-weight", "bold").style("font-size", "13px")
         .text(`Classement en ${currentYear}`);
 }

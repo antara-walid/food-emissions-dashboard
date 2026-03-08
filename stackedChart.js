@@ -5,7 +5,7 @@ function drawStackedChart() {
     const width = containerDiv.node().getBoundingClientRect().width || 900;
     const height = containerDiv.node().getBoundingClientRect().height || 300;
     
-    const margin = {top: 40, right: 130, bottom: 30, left: 60}; 
+    const margin = {top: 60, right: 130, bottom: 30, left: 60}; 
 
     const shortLabels = {
         "Changement d'utilisation des terres": "Occupation des sols",
@@ -97,11 +97,17 @@ function drawStackedChart() {
         .attr("fill", d => color(d.key)).attr("opacity", 0.9).attr("d", area);
 
     svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x).tickFormat(d3.format("d")));
-    svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).ticks(5, "s"));
+    
+    svg.append("g").attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(5).tickFormat(d => d3.format(".2s")(d * 1000).replace("G", "Md")));
 
-    svg.append("text").attr("x", margin.left).attr("y", margin.top - 15)
+    svg.append("text").attr("x", margin.left).attr("y", 25)
         .attr("font-size", "14px").attr("font-weight", "bold").attr("fill", "#333")
         .text(selectedCountries.length === 0 ? "Émissions mondiales liées à l’alimentation selon les étapes du cycle de vie mondial" : `Émissions liées à l’alimentation selon les étapes du cycle de vie`);
+
+    svg.append("text").attr("x", margin.left).attr("y", 45)
+        .attr("font-size", "11px").attr("fill", "#666")
+        .text("Unité : Tonnes de CO₂ équivalent (t CO₂eq)");
 
     const legend = svg.append("g")
         .attr("transform", `translate(${width - margin.right + 15}, ${margin.top})`);
@@ -197,7 +203,7 @@ function drawStackedChart() {
                             <div style="width:10px; height:10px; background:${color(stage)}; border-radius:2px;"></div>
                             <span style="color:#666;">${frenchName} :</span>
                         </div>
-                        <span style="font-weight:bold;">${d3.format(".2s")(value).replace("G", "Md")} t</span>
+                        <span style="font-weight:bold;">${d3.format(".2s")(value * 1000).replace("G", "Md")} t</span>
                     </div>
                 `;
             });
@@ -205,7 +211,7 @@ function drawStackedChart() {
             htmlContent += `
                 <div style="margin-top:8px; padding-top:8px; display:flex; justify-content:space-between; font-weight:bold; color:#d62728; border-top:1px solid #eee;">
                     <span>TOTAL :</span>
-                    <span>${d3.format(".2s")(total).replace("G", "Md")} t</span>
+                    <span>${d3.format(".2s")(total * 1000).replace("G", "Md")} t</span>
                 </div>
             </div>`;
             

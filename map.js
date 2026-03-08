@@ -127,7 +127,9 @@ function drawMap() {
         ? d3.scaleLog().domain(domain).range([0, legendWidth])
         : d3.scaleLinear().domain(domain).range([0, legendWidth]);
 
-    const legendAxis = d3.axisBottom(legendScalePos).ticks(5, isTotal ? ".0s" : ".0f");
+    const legendAxis = d3.axisBottom(legendScalePos).ticks(5)
+        .tickFormat(d => isTotal ? d3.format(".0s")(d).replace("G", "Md") : d3.format(".0f")(d));
+        
     legendGroup.append("g").attr("transform", `translate(0, ${legendHeight})`).call(legendAxis).select(".domain").remove();
 
     const cursorsGroup = legendGroup.append("g");

@@ -6,13 +6,13 @@ function drawBarChart() {
 
     const isTotal = selectedMetric === "Total (tonnes CO₂eq)";
     const getValue = d => isTotal ? d.emission_total : d.emission_share;
-    const formatValue = isTotal ? d3.format(".2s") : d => d3.format(".1f")(d) + "%";
+    const formatValue = isTotal ? d => d3.format(".2s")(d).replace("G", "Md") : d => d3.format(".1f")(d) + "%";
 
     let barData = data.filter(d => d.year === currentYear && selectedCountries.includes(d.id));
     
     barData.sort((a, b) => getValue(b) - getValue(a));
 
-    const margin = {top: 30, right: 60, bottom: 10, left: 100};
+    const margin = {top: 50, right: 60, bottom: 10, left: 100};
     const width = containerWidth; 
     const contentHeight = Math.max(50, barData.length * 35); 
     const height = contentHeight + margin.top + margin.bottom;
@@ -48,8 +48,9 @@ function drawBarChart() {
        .attr("fill", d => color(d.id))
        .attr("rx", 3);
 
-    svg.append("g").selectAll("text")
+    svg.append("g").selectAll("text.val")
        .data(barData).join("text")
+       .attr("class", "val")
        .attr("x", d => x(getValue(d)) + 5)
        .attr("y", d => y(d.country) + y.bandwidth() / 2)
        .attr("dy", "0.35em")
@@ -64,4 +65,11 @@ function drawBarChart() {
         .attr("y", 20)
         .style("font-weight", "bold").style("font-size", "14px")
         .text(`Classement en ${currentYear}`);
+
+    svg.append("text")
+        .attr("x", margin.left)
+        .attr("y", 38)
+        .style("font-size", "11px")
+        .style("fill", "#666")
+        .text(isTotal ? "Unité : Tonnes de CO₂ équivalent (t CO₂eq)" : "Unité : Part des émissions mondiales (%)");
 }

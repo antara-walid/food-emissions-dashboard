@@ -4,13 +4,13 @@ function drawLineChart() {
 
     const containerWidth = containerDiv.node().getBoundingClientRect().width || 400;
 
-    const margin = {top: 30, right: 30, bottom: 30, left: 60}; 
+    const margin = {top: 50, right: 30, bottom: 30, left: 60}; 
     const width = containerWidth; 
     const height = 300;
 
     const isTotal = selectedMetric === "Total (tonnes CO₂eq)";
     const getValue = d => isTotal ? d.emission_total : d.emission_share;
-    const formatValue = isTotal ? d3.format(".2s") : d => d3.format(".1f")(d) + "%";
+    const formatValue = isTotal ? d => d3.format(".2s")(d).replace("G", "Md") : d => d3.format(".1f")(d) + "%";
     const titleText = isTotal ? "Évolution des émissions totales" : "Évolution de la part liées à l’alimentation (%)";
 
     const container = containerDiv.append("div").style("position", "relative");
@@ -29,6 +29,20 @@ function drawLineChart() {
     const svg = container.append("svg")
         .attr("width", width).attr("height", height)
         .style("background", "white").style("border-radius", "8px");
+
+    svg.append("text")
+        .attr("x", margin.left)
+        .attr("y", 20)
+        .style("font-weight", "bold")
+        .style("font-size", "14px")
+        .text(titleText);
+
+    svg.append("text")
+        .attr("x", margin.left)
+        .attr("y", 38)
+        .style("font-size", "11px")
+        .style("fill", "#666")
+        .text(isTotal ? "Unité : Tonnes de CO₂ équivalent (t CO₂eq)" : "Unité : Part des émissions mondiales (%)");
 
     const filteredData = data.filter(d => selectedCountries.includes(d.id));
 
@@ -54,7 +68,7 @@ function drawLineChart() {
        .call(d3.axisBottom(x).tickFormat(d3.format("d")));
     
     svg.append("g").attr("transform", `translate(${margin.left},0)`)
-       .call(d3.axisLeft(y).ticks(5, isTotal ? "s" : null));
+       .call(d3.axisLeft(y).ticks(5).tickFormat(d => isTotal ? d3.format(".2s")(d).replace("G", "Md") : d));
 
     const groupedData = d3.group(filteredData, d => d.id);
      
@@ -68,10 +82,6 @@ function drawLineChart() {
            .y(v => y(getValue(v)))
            (d[1])
        );
-
-    svg.append("text").attr("x", margin.left).attr("y", 15)
-        .style("font-weight", "bold").style("font-size", "14px")
-        .text(titleText);
 
     const verticalLine = svg.append("line")
         .attr("stroke", "#999").attr("stroke-width", 1).attr("stroke-dasharray", "4")

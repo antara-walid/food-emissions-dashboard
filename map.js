@@ -104,7 +104,7 @@ function drawMap() {
                 const formatted = d3.format(".2s")(value).replace("G", "Md");
                 infoValue.text(`Émissions : ${formatted} tonnes CO₂eq`);
             } else {
-                infoValue.text(`Part liées à l’alimentation : ${d3.format(".1f")(value)} %`);   // Part des émissions mondiales de gaz à effet de serre liées à l’alimentation
+                infoValue.text(`Part liées à l'alimentation : ${d3.format(".1f")(value)} %`);
             }
         } else {
             infoValue.text("Pas de données pour cette année");
@@ -130,24 +130,60 @@ function drawMap() {
     const legendAxis = d3.axisBottom(legendScalePos).ticks(5, isTotal ? ".0s" : ".0f");
     legendGroup.append("g").attr("transform", `translate(0, ${legendHeight})`).call(legendAxis).select(".domain").remove();
 
-    const cursor = legendGroup.append("g").attr("opacity", 0);
-    cursor.append("path").attr("d", d3.symbol().type(d3.symbolTriangle).size(100)).attr("transform", "rotate(180)").attr("fill", "#333").attr("stroke", "white");
-    const cursorText = cursor.append("text").attr("y", -10).attr("text-anchor", "middle").attr("font-size", "11px").attr("font-weight", "bold").attr("fill", "#333");
+    const cursorsGroup = legendGroup.append("g");
 
-    function drawCursor(value, name) {
-        if (value == null) { cursor.attr("opacity", 0); return; }
-        let safeValue = value;
-        if (!isTotal) { safeValue = Math.max(0, Math.min(100, value)); }
-        else { safeValue = Math.max(domain[0], Math.min(domain[1], value)); }
+    function drawAllCursors() {
+        const selectedData = selectedCountries.map(countryId => {
+            const countryFeature = geoData.features.find(f => f.id === countryId);
+            const value = dataMap.get(countryId);
+            return {
+                id: countryId,
+                name: countryFeature ? countryFeature.properties.name : countryId,
+                value: value
+            };
+        }).filter(d => d.value != null);
 
-        const x = legendScalePos(safeValue);
-        cursor.attr("opacity", 1).attr("transform", `translate(${x}, 0)`);
-        cursorText.text(name);
+        cursorsGroup.selectAll("g").remove();
+
+        const cursors = cursorsGroup.selectAll("g")
+            .data(selectedData)
+            .join("g")
+            .attr("class", "country-cursor");
+
+        cursors.each(function(d) {
+            let safeValue = d.value;
+            if (!isTotal) {
+                safeValue = Math.max(0, Math.min(100, d.value));
+            } else {
+                safeValue = Math.max(domain[0], Math.min(domain[1], d.value));
+            }
+
+            const x = legendScalePos(safeValue);
+            const cursor = d3.select(this);
+            
+            cursor.attr("transform", `translate(${x}, 0)`);
+            
+            cursor.append("path")
+                .attr("d", d3.symbol().type(d3.symbolTriangle).size(100))
+                .attr("transform", "rotate(180)")
+                .attr("fill", "#333")
+                .attr("stroke", "white")
+                .attr("stroke-width", 1);
+            
+            cursor.append("text")
+                .attr("y", -10)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "11px")
+                .attr("font-weight", "bold")
+                .attr("fill", "#333")
+                .text(d.name);
+        });
     }
+
+    drawAllCursors();
 
     if (lastFocus) {
         const currentVal = dataMap.get(lastFocus.id);
         drawInfo(lastFocus.name, currentVal);
-        drawCursor(currentVal, lastFocus.name);
     }
 }
